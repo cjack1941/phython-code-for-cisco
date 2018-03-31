@@ -1,0 +1,114 @@
++#!/usr/bin/python
+
+from netmiko import ConnectHandler
+from datetime import datetime
+import sys
+import time
+
+
+
+cisco_2800_1 = {
+'device_type': 'cisco_ios',
+'ip': '10.10.10.1',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+cisco_2800_2 = {
+'device_type': 'cisco_ios',
+'ip': '10.10.10.2',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+cisco_2800_4 = {
+'device_type': 'cisco_ios',
+'ip': '172.16.11.1',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+cisco_2800_5 = {
+'device_type': 'cisco_ios',
+'ip': '172.16.11.2',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+cisco_1841 = {
+'device_type': 'cisco_ios',
+'ip': '10.10.10.3',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+cisco_3550_1 = {
+'device_type': 'cisco_ios',
+'ip': '192.168.1.30',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+cisco_3550_2 = {
+'device_type': 'cisco_ios',
+'ip': '192.168.1.29',
+'username': '_',
+'password': '_',
+'secret': '_', # optional, defaults to ''
+'verbose': False, # optional, defaults to False
+}
+
+all_devices = [cisco_2800_1, cisco_2800_2, cisco_2800_4, cisco_2800_5, cisco_3550_1, cisco_3550_2, cisco_1841]
+
+start_time=datetime.now()
+for a_device in all_devices:
+	net_connect=ConnectHandler(**a_device)
+	net_connect.enable()
+	print(time.strftime('%a %Y-%m-%d %H:%M:%S'))
+	print net_connect.find_prompt()
+	output = net_connect.send_command("show arp")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	output = net_connect.send_command("show ip int br")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	output = net_connect.send_command("show ip route")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	output = net_connect.send_command("show control-plane host open-ports")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	output = net_connect.send_command("show run")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	output = net_connect.send_command("show ip protocols")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	output = net_connect.send_command("show mpls traffic-eng tunnels")
+	print "\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device {0} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".format(a_device['device_type'])
+	print output
+	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+	print "Time elapsed: {}\n".format(datetime.now() - start_time)
+	
+#* * * * * cd /home/cjackson/cisco_cron_test.txt/ && /usr/bin/python /home/cjackson/cisco_ssh_newtool.py >> /home/cjackson/python_log.txt
+
+*/5 5 * * * /home/cjackson/ssh_cisco_tool.py > /home/cjackson/cisco_output.log
+*/8 5 * * * /home/cjackson/cisco_output.log | mail -s "cisco_output" cedricjackson
